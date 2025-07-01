@@ -91,10 +91,19 @@ app.get('/api/top-tracks', async (req, res) => {
     return res.status(401).send('Not authenticated');
   }
 
+  const time_range = req.query.time_range || 'short_term';
+  const limit = req.query.limit || 5;
+
   try {
     const response = await axios.get(
       'https://api.spotify.com/v1/me/top/tracks',
-      { headers: { Authorization: `Bearer ${token}` } }
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        params: {
+          time_range,
+          limit
+        }
+      }
     );
     res.json(response.data);
   } catch (err) {
@@ -102,6 +111,36 @@ app.get('/api/top-tracks', async (req, res) => {
     res.status(500).send('Error fetching top tracks.');
   }
 });
+
+app.get('/api/top-artists', async (req, res) => {
+  const token = req.cookies.access_token;
+  if (!token) {
+    return res.status(401).send('Not authenticated');
+  }
+
+  const time_range = req.query.time_range || 'short_term';
+  const limit = req.query.limit || 5;
+
+  try {
+    const response = await axios.get(
+      'https://api.spotify.com/v1/me/top/artists',
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        params: {
+          time_range,
+          limit
+        }
+      }
+    );
+    res.json(response.data);
+  } catch (err) {
+    console.error(err.response?.data || err.message);
+    res.status(500).send('Error fetching top artists.');
+  }
+});
+
 
 
 app.listen(PORT, () => console.log(`Server running on http://127.0.0.1:${PORT}`));
