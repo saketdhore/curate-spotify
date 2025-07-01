@@ -33,7 +33,7 @@ const ArtistCarousel = ({ topArtists, onTimeRangeChange }) => {
         />
       </div>
 
-      <div className="carousel carousel-vertical rounded-box h-128 w-128 border border-gray-200 shadow">
+      <div className="carousel carousel-vertical rounded-box h-96 w-96 border border-gray-200 shadow">
         {topArtists.map((artist, index) => (
           <div
             key={artist.id}

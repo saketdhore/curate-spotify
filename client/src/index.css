@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cherry+Cream+Soda&family=Tilt+Neon&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bungee+Spice&family=Cherry+Cream+Soda&family=Luckiest+Guy&family=Sour+Gummy&family=Tilt+Neon&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @plugin "daisyui";
@@ -21,6 +21,28 @@
     "XROT" 0,
     "YROT" 0;
 }
+
+.bungee-spice-regular {
+  font-family: "Bungee Spice", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.luckiest-guy-regular {
+  font-family: "Luckiest Guy", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.sour-gummy-title {
+  font-family: "Sour Gummy", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+    "wdth" 100;
+}
+
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);

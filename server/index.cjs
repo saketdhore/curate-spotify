@@ -6,11 +6,11 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000
 app.use(cookieParser());
 
 app.use(cors({
-  origin: 'http://127.0.0.1:5173',  // Vite dev server default
+  origin: 'http://127.0.0.1:5173', 
   credentials: true
 }));
 
@@ -18,7 +18,6 @@ const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URI = process.env.REDIRECT_URI;
 
-let access_token = ''; // TEMP: store in memory for now
 
 app.get('/login', (req, res) => {
   const scope = 'user-read-recently-played user-top-read';
