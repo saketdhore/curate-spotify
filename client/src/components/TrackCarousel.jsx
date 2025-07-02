@@ -1,37 +1,42 @@
-import { useState } from "react";
+import { useState, memo } from "react";
 
 const TrackCarousel = ({ topTracks, onTimeRangeChange }) => {
-    const [tab, setTab] = useState(0); 
-    const handleTabClick = (range) => {
-        setTab(range);
-        onTimeRangeChange(range);
-    }
+  const [tab, setTab] = useState('short_term');
+  
+  const handleTabClick = (range) => {
+    setTab(range);
+    onTimeRangeChange(range);
+  }
+  
   return (
     <div className="flex flex-col items-center gap-4">
-      <h2 className="text-2xl text-slate-200 font-bold">Top Tracks</h2>
-      <div className="tabs tabs-boxed">
-        <input
-          type="radio"
-          name="track_tabs"
-          className="tab text-slate-200 text-lg"
-          aria-label="Last 4 Weeks"
-          defaultChecked
+      <h2 className="text-2xl text-black font-bold">Top Tracks</h2>
+      
+      <div className="flex bg-gray-100 rounded-lg p-1">
+        <button
+          className={`px-4 py-2 rounded-md text-black font-medium transition-colors ${
+            tab === 'short_term' ? 'bg-gray-300' : 'hover:bg-gray-200'
+          }`}
           onClick={() => handleTabClick('short_term')}
-        />
-        <input
-          type="radio"
-          name="track_tabs"
-          className="tab text-slate-200 text-lg"
-          aria-label="Last 6 Months"
+        >
+          Last 4 Weeks
+        </button>
+        <button
+          className={`px-4 py-2 rounded-md text-black font-medium transition-colors ${
+            tab === 'medium_term' ? 'bg-gray-300' : 'hover:bg-gray-200'
+          }`}
           onClick={() => handleTabClick('medium_term')}
-        />
-        <input
-          type="radio"
-          name="track_tabs"
-          className="tab text-slate-200 text-lg"
-          aria-label="Last Year"
+        >
+          Last 6 Months
+        </button>
+        <button
+          className={`px-4 py-2 rounded-md text-black font-medium transition-colors ${
+            tab === 'long_term' ? 'bg-gray-300' : 'hover:bg-gray-200'
+          }`}
           onClick={() => handleTabClick('long_term')}
-        />
+        >
+          Last Year
+        </button>
       </div>
 
       <div className="carousel carousel-vertical rounded-box h-96 w-96 border border-gray-200 shadow">
@@ -62,4 +67,4 @@ const TrackCarousel = ({ topTracks, onTimeRangeChange }) => {
   );
 };
 
-export default TrackCarousel;
+export default memo(TrackCarousel);

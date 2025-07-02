@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useEffect } from "react";
-const useTopFetch = (fetchFunction, initVal, user) => {
+const useTopFetch = (fetchFunction, initVal, user, initLimit) => {
   const [isFetching, setIsFetching] = useState(false);
   const [top, setTop] = useState(initVal);
-  const [limit, setLimit] = useState(5);
+  const [limit, setLimit] = useState(initLimit);
   const [timeRange, setTimeRange] = useState('short_term');
   const [fetchError, setFetchError] = useState(null);
 
