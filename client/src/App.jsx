@@ -4,103 +4,58 @@ import ArtistCarousel from './components/ArtistCarousel';
 import TrackCarousel from './components/TrackCarousel';
 import GenreDonutChart from './components/GenreDonutChart';
 import Hero from './components/Hero';
+import { fetchTopArtists, fetchTopTracks, fetchUser } from './api.js';
+import useTopFetch from './hooks/useTopFetch.jsx';
+
 export default function App() {
-  const [tracks, setTracks] = useState([]);
   const [user, setUser] = useState(null);
-  const [topArtists, setTopArtists] = useState([]);
-  const [tab,setTab] = useState('home');
-  const [artistTimeRange, setArtistTimeRange] = useState('short_term');
-  const [trackTimeRange, setTrackTimeRange] = useState('short_term');
+  const [tab, setTab] = useState('home');
 
-  const handleTabClick = (active) =>{
+  const handleTabClick = (active) => {
     setTab(active);
-  }
-  // ✅ Fetch user on mount
+  };
+
   useEffect(() => {
-    const checkUser = async () => {
-      const res = await fetch('http://127.0.0.1:3000/api/me', {
-        credentials: 'include',
-      });
-
-      if (res.status === 200) {
-        const data = await res.json();
-        setUser(data.user);
-      } else {
-        setUser(null);
-      }
+    const loadUser = async () => {
+      const fetchedUser = await fetchUser();
+      setUser(fetchedUser);
     };
-
-    checkUser();
+    loadUser();
   }, []);
+  const {
+    top: topArtists,
+    setTop: setTopArtists,
+    timeRange: artistTimeRange,
+    setTimeRange: setArtistTimeRange,
+    limit: artistLimit,
+    setLimit: setArtistLimit
+  } = useTopFetch(fetchTopArtists, [], user, 5);
 
-  // ✅ Refetch artists when user or artistTimeRange changes
-  useEffect(() => {
-    const loadTopArtists = async () => {
-      const artists = await fetchTopArtists(artistTimeRange);
-      setTopArtists(artists);
-    };
+  const {
+    top: tracks,
+    setTop: setTracks,
+    timeRange: trackTimeRange,
+    setTimeRange: setTrackTimeRange,
+    limit: trackLimit,
+    setLimit: setTrackLimit
+  } = useTopFetch(fetchTopTracks, [], user, 5);
 
-    if (user) {
-      loadTopArtists();
-    }
-  }, [artistTimeRange, user]);
 
-  // ✅ Refetch tracks when user or trackTimeRange changes
-  useEffect(() => {
-    const loadTopTracks = async () => {
-      const tracks = await fetchTopTracks(trackTimeRange);
-      setTracks(tracks);
-    };
-
-    if (user) {
-      loadTopTracks();
-    }
-  }, [trackTimeRange, user]);
-
-  // ✅ Logout
   const handleLogOut = () => {
     window.location.href = 'http://127.0.0.1:3000/logout';
   };
 
-  // ✅ Reusable fetchers
-  const fetchTopTracks = async (time_range = 'short_term', limit = 5) => {
-    const res = await fetch(
-      `http://127.0.0.1:3000/api/top-tracks?time_range=${time_range}&limit=${limit}`,
-      {
-        credentials: 'include',
-      }
-    );
-
-    if (res.status === 200) {
-      const data = await res.json();
-      return data.items || [];
-    } else {
-      console.log('Error fetching tracks.');
-      return [];
-    }
-  };
-
-  const fetchTopArtists = async (time_range = 'short_term', limit = 5) => {
-    const res = await fetch(
-      `http://127.0.0.1:3000/api/top-artists?time_range=${time_range}&limit=${limit}`,
-      {
-        credentials: 'include',
-      }
-    );
-
-    if (res.status === 200) {
-      const data = await res.json();
-      return data.items || [];
-    } else {
-      console.log('Error fetching artists.');
-      return [];
-    }
-  };
-
   return (
     <main className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-16 px-4 pt-16">
-      <Navbar user={user} handleLogOut={handleLogOut} tabActive={tab} onTabClick={handleTabClick} />
-      {tab === 'home' && <Hero user={user}/>}
+      <Navbar
+        user={user}
+        handleLogOut={handleLogOut}
+        tabActive={tab}
+        onTabClick={handleTabClick}
+      />
+
+      {tab === 'home' && <Hero user={user} />}
+
       {user && tab === 'stats' && (
         <div className="flex flex-wrap gap-4 w-full max-w-7xl justify-center">
           <div className="card bg-base-300 rounded-box grid grow place-items-center p-4">
@@ -118,14 +73,9 @@ export default function App() {
           </div>
 
           <div className="card bg-base-300 rounded-box grid grow place-items-center p-4">
-            <GenreDonutChart
-              topArtists={topArtists}
-              timeRange={artistTimeRange}
-              onTimeRangeChange={setArtistTimeRange}
-            />
+            <GenreDonutChart topArtists={topArtists} timeRange={artistTimeRange} onTimeRangeChange={setArtistTimeRange} />
           </div>
         </div>
-
       )}
     </main>
   );
