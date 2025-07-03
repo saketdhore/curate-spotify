@@ -25,7 +25,7 @@ const LogIn = ({ user, handleLogOut }) => {
       <DropdownMenuTrigger asChild>
         <button className="flex items-center space-x-2 outline-none">
           <img
-            src={user.images?.[0]?.url || DEFAULT_PROFILE}
+            src={DEFAULT_PROFILE}
             alt="Profile"
             className="w-12 h-12 mr-4"
           />

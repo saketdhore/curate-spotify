@@ -31,7 +31,7 @@ const Navbar = ({ user, handleLogOut, onTabClick }) => {
 
         {/* Playlist tab */}
         <div 
-          onClick={() => onTabClick('playlist')}
+          onClick={() => onTabClick('playlists')}
           className="bg-neutral-900 text-white hover:bg-neutral-500 hover:border-neutral-500 hover:cursor-pointer font-bold py-2 px-8 border-b-4 mt-2 border-neutral-700 rounded-3xl"
         >
           <p className="hover:cursor-pointer">Playlist</p>
@@ -61,7 +61,7 @@ const Navbar = ({ user, handleLogOut, onTabClick }) => {
 
             {/* Playlist tab */}
             <div
-              onClick={() => handleTabClick('playlist')}
+              onClick={() => handleTabClick('playlists')}
               className="px-4 py-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100"
             >
               <p className="text-neutral-900 font-semibold">Playlist</p>

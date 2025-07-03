@@ -4,6 +4,8 @@ import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import TopStats from './components/TopStats.jsx';
 import { fetchUser } from './api.js';
+
+import UserPlaylistsCarousel from './components/UserPlaylistsCarousel.jsx';
 ;
 
 export default function App() {
@@ -20,6 +22,7 @@ export default function App() {
     const loadUser = async () => {
       const fetchedUser = await fetchUser();
       setUser(fetchedUser);
+      console.log(fetchedUser);
     };
     loadUser();
   }, []);
@@ -42,6 +45,7 @@ export default function App() {
       <main className="min-h-screen bg-gray-50 flex flex-col items-center gap-16 px-4 pt-32 md:pt-28">
         {tab === 'home' && <Hero user={user} />}
         {user && tab === 'stats' && <TopStats user={user} />}
+        {user && tab === 'playlists' && <UserPlaylistsCarousel />}
       </main>
     </>
 

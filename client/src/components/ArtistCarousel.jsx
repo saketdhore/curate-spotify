@@ -2,15 +2,16 @@ import { useState, memo } from "react";
 
 const ArtistCarousel = ({ topArtists, onTimeRangeChange }) => {
   const [tab, setTab] = useState('short_term');
-
+  
   const handleTabClick = (range) => {
     setTab(range);
     onTimeRangeChange(range);
-  };
-
+  }
+  
   return (
     <div className="flex flex-col items-center gap-4">
       <h2 className="text-2xl text-black font-bold">Top Artists</h2>
+      
       <div className="flex bg-gray-100 rounded-lg p-1">
         <button
           className={`px-4 py-2 rounded-md text-black font-medium transition-colors ${
