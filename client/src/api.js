@@ -51,15 +51,26 @@ export const fetchGenreArtists = async (time_range = 'short_term', limit=20) => 
 };
 
 export const fetchUser = async () => {
-    const res = await fetch('http://127.0.0.1:3000/api/me', {
-        credentials: 'include',
+  try {
+    const response = await fetch('http://127.0.0.1:3000/api/me', {
+      credentials: 'include'
     });
-
-    if(res.status === 200){
-        const data = await res.json();
-        return data.user;
-    } else{
-        console.log("Error fetching user.");
-        return null;
+    
+    if (response.status === 401) {
+      // User is not authenticated - this is OK
+      return null;
     }
-}
+    
+    if (!response.ok) {
+      console.error('Unexpected error:', response.status);
+      return null;
+    }
+    
+    const data = await response.json();
+    return data.user;
+  } catch (error) {
+    console.error('Network error fetching user:', error);
+    return null;
+  }
+};
+

@@ -1,12 +1,9 @@
 import { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
-
 import Hero from './components/Hero';
 import TopStats from './components/TopStats.jsx';
-import { fetchUser } from './api.js';
-
 import UserPlaylistsCarousel from './components/UserPlaylistsCarousel.jsx';
-;
+import { fetchUser } from './api.js';
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -22,14 +19,17 @@ export default function App() {
     const loadUser = async () => {
       const fetchedUser = await fetchUser();
       setUser(fetchedUser);
-      console.log(fetchedUser);
+      if (fetchedUser) {
+        console.log('User logged in:', fetchedUser);
+      }
     };
     loadUser();
   }, []);
 
-
+  
 
   const handleLogOut = () => {
+    setUser(null);
     window.location.href = 'http://127.0.0.1:3000/logout';
   };
 
@@ -48,6 +48,5 @@ export default function App() {
         {user && tab === 'playlists' && <UserPlaylistsCarousel />}
       </main>
     </>
-
   );
 }

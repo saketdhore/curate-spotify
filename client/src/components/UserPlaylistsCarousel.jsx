@@ -1,11 +1,20 @@
-import { useState, memo } from 'react';
+import { useState, memo, useRef} from 'react';
 import PLUS from '../assets/plus-square.svg';
-
+import PlaylistModal from './PlaylistModal';
 const UserPlaylistsCarousel = () => {
     const [playlists, setPlaylists] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [selectedPlaylist, setSelectedPlaylist] = useState(null);
+    const modalRef = useRef();
+    const handlePlaylistClick = (playlist) => {
+        setSelectedPlaylist(playlist);
+        modalRef.current?.open();
+    };
 
+    const handleCloseModal = () => {
+        setSelectedPlaylist(null);
+    };
     const handleImportPlaylists = async () => {
         setLoading(true);
         setError(null);
@@ -14,7 +23,6 @@ const UserPlaylistsCarousel = () => {
             const response = await fetch('http://127.0.0.1:3000/api/import-all-playlists', {
                 credentials: 'include'
             });
-
             console.log('Response status:', response.status);
             console.log('Response headers:', response.headers);
 
@@ -89,7 +97,7 @@ const UserPlaylistsCarousel = () => {
                         className="w-64 h-64 object-cover cursor-pointer hover:opacity-80 transition-opacity"
                         title={playlist.name}
                     />
-                    <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-75 transition-opacity duration-300 flex items-center justify-center hover:cursor-pointer">
+                    <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-75 transition-opacity duration-300 flex items-center justify-center hover:cursor-pointer" onClick={()=>handlePlaylistClick(playlist)}>
                         <div className="text-center text-white px-4">
                             <div className="text-xl font-semibold">{playlist.name}</div>
                             <div className="text-sm mt-2 opacity-90 ">
@@ -99,6 +107,7 @@ const UserPlaylistsCarousel = () => {
                     </div>
                 </div>
             ))}
+            <PlaylistModal ref={modalRef} playlist={selectedPlaylist} onClose={handleCloseModal}/>
         </div>
     );
 };

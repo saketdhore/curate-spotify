@@ -18,7 +18,6 @@ const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URI = process.env.REDIRECT_URI;
 
-
 app.get('/login', (req, res) => {
   const scope = 'user-read-recently-played user-top-read';
   const authURL = `https://accounts.spotify.com/authorize?` +
@@ -29,6 +28,7 @@ app.get('/login', (req, res) => {
 });
 
 app.get('/login/playlists', (req, res) => {
+  // Just request ALL scopes we need - both original and playlist scopes
   const scope = 'user-read-recently-played user-top-read playlist-read-private playlist-read-collaborative';
   const authURL = `https://accounts.spotify.com/authorize?` +
     `response_type=code&client_id=${CLIENT_ID}&scope=${encodeURIComponent(scope)}` +
@@ -45,7 +45,6 @@ app.get('/logout', (req, res) => {
   });
   res.redirect('http://127.0.0.1:5173/');
 });
-
 
 app.get('/callback', async (req, res) => {
   const code = req.query.code;
@@ -70,8 +69,8 @@ app.get('/callback', async (req, res) => {
     maxAge: 3600 * 1000
   });
 
-  // Redirect user back to frontend
-  res.redirect('http://127.0.0.1:5173/');
+  // Redirect user back to frontend with reload flag
+  res.redirect('http://127.0.0.1:5173');
 });
 
 app.get('/api/me', async (req, res) => {
@@ -86,7 +85,7 @@ app.get('/api/me', async (req, res) => {
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
-    console.log(res.json({ user: response.data }));
+    res.json({ user: response.data });
   } catch (err) {
     console.error(err.response?.data || err.message);
     res.status(401).json({ user: null });
@@ -158,9 +157,8 @@ app.get('/api/import-all-playlists', async (req, res) => {
   try {
     let allPlaylists = [];
     let offset = 0;
-    const limit = 50; // Maximum allowed by Spotify API
+    const limit = 50;
 
-    // Fetch all playlists using pagination
     while (true) {
       const response = await axios.get(
         'https://api.spotify.com/v1/me/playlists',
@@ -173,7 +171,6 @@ app.get('/api/import-all-playlists', async (req, res) => {
       const playlists = response.data.items;
       allPlaylists.push(...playlists);
 
-      // If we got fewer items than the limit, we've reached the end
       if (playlists.length < limit) {
         break;
       }
@@ -181,7 +178,6 @@ app.get('/api/import-all-playlists', async (req, res) => {
       offset += limit;
     }
 
-    // Filter playlists to only include those with 5 or more tracks
     const filteredPlaylists = allPlaylists.filter(playlist => {
       return playlist.tracks && playlist.tracks.total >= 5;
     });
@@ -196,11 +192,10 @@ app.get('/api/import-all-playlists', async (req, res) => {
 
   } catch (err) {
     if (err.response?.status === 403) {
-      // Insufficient scope - need playlist permissions
+      // Just return 403 - the frontend will redirect
       return res.status(403).json({
         error: 'Insufficient permissions',
-        message: 'Please authorize playlist access',
-        code: 'INSUFFICIENT_SCOPE'
+        message: 'Please authorize playlist access'
       });
     }
 
@@ -212,6 +207,60 @@ app.get('/api/import-all-playlists', async (req, res) => {
   }
 });
 
+app.get('/api/playlist-items', async (req, res) => {
+  console.log('Incoming request to /api/playlist-items');
+
+  const token = req.cookies.access_token;
+  if (!token) {
+    console.log('No access token found in cookies');
+    return res.status(401).send('Not authenticated');
+  }
+
+  const playlistId = req.query.id;
+  if (!playlistId) {
+    console.log('No playlist ID provided');
+    return res.status(400).send('Missing playlist id');
+  }
+
+  console.log(`Fetching tracks for playlist ID: ${playlistId}`);
+
+  try {
+    let allTracks = [];
+    let offset = 0;
+    const limit = 50;
+
+    while (true) {
+      console.log(`Fetching tracks with offset: ${offset}`);
+
+      const response = await axios.get(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { limit, offset }
+      });
+
+      const tracks = response.data.items;
+      console.log(`Fetched ${tracks.length} tracks`);
+
+      allTracks.push(...tracks);
+
+      if (tracks.length < limit) {
+        console.log('All tracks fetched');
+        break; // Done paging
+      }
+
+      offset += limit;
+    }
+
+    console.log(`Returning ${allTracks.length} total tracks`);
+    res.json({
+      tracks: allTracks,
+      total: allTracks.length
+    });
+
+  } catch (error) {
+    console.error('Error fetching playlist items:', error.message);
+    res.status(500).send('Failed to fetch playlist items');
+  }
+});
 
 
 app.listen(PORT, () => console.log(`Server running on http://127.0.0.1:${PORT}`));
